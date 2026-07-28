@@ -38,7 +38,7 @@
                 <div class="bg-body-secondary rounded-4 shadow border p-3 h-100 d-flex flex-column justify-content-between">
                     
                     <div>
-                        <!-- כותרת דינאמית (משתנה בין הוספה לעריכה) -->
+                        
                         <h5 id="sidebar-title" class="fw-bold mb-3 text-center border-bottom pb-2">הוספת אלמנט - כותרת</h5>
 
                         <!-- Radio button - Elemnt Type -->
@@ -67,7 +67,7 @@
 
                         <form id="element-form">
                             
-                            <!-- מאפיינים כלליים -->
+                            
                             <div class="border-bottom pb-2 mb-2">
                                 <h6 class="fw-bold small text-muted mb-2">מאפיינים כלליים</h6>
                                 
@@ -94,18 +94,18 @@
                                 </div>
                             </div>
 
-                            <!-- מאפייני טקסט ועיצוב -->
+                            
                             <div id="text-styling-container" class="border-bottom pb-2 mb-2">
                                 <h6 class="fw-bold small text-muted mb-2">עיצוב טקסט וצבעים</h6>
 
                                 <div class="row g-2 mb-2 align-items-center">
-                                <!-- גודל גופן -->
+                                
                                 <div class="col-4 d-flex align-items-center justify-content-between">
                                     <label class="form-label small mb-0 me-1 text-nowrap">גודל:</label>
                                     <input type="number" id="prop-font-size" class="form-control form-control-sm text-center" value="16" min="1" dir="ltr" style="width: 50px;">
                                 </div>
                                 
-                                <!-- הדגשה וקו תחתון -->
+                                
                                 <div class="col-3 d-flex justify-content-center">
                                     <div class="btn-group btn-group-sm" role="group">
                                         <input type="checkbox" class="btn-check" id="prop-bold" autocomplete="off">
@@ -116,7 +116,7 @@
                                     </div>
                                 </div>
 
-                                <!-- יישור -->
+                                
                                 <div class="col-5 d-flex align-items-center justify-content-end">
                                     <div class="btn-group btn-group-sm" role="group">
                                         <input type="radio" class="btn-check" name="propAlign" id="align-right" value="start" checked>
@@ -143,7 +143,7 @@
                                 </div>
                             </div>
 
-                            <!-- מאפיינים דינאמיים -->
+                            
                             <h6 class="fw-bold small text-muted mb-2">מאפיינים נוספים</h6>
                             
                             <div id="dynamic-inputs">
@@ -152,7 +152,7 @@
                         </form>
                     </div>
 
-                    <!-- כפתור פעולה ראשי בתחתית הסרגל -->
+                    
                     <div class="mt-3">
                         <button type="submit" form="element-form" id="submit-btn" class="btn btn-success w-100 fw-bold">
                             <i class="bi bi-plus-lg me-1"></i> הוסף אלמנט
@@ -165,7 +165,7 @@
             
             <section class="col-12 col-lg-9 d-flex flex-column">
                 <div id="canvas-container" class="bg-white rounded-4 shadow-sm border p-4 flex-grow-1 position-relative overflow-auto">
-                    <!-- כאן יורנדרו האלמנטים הדינמיים בלייב -->
+                    
                     <div class="text-center text-muted py-5 my-5">
                         <i class="bi bi-plus-square fs-1"></i>
                         <p class="mt-2">הקנבס ריק. בחר אלמנט בסרגל הצד כדי להתחיל לבנות!</p>
@@ -182,13 +182,6 @@
     <footer class="text-center py-2 bg-body-tertiary border-top">
         <small class="text-muted">נוצר על ידי ענבל פיש <span dir="ltr">&copy; 2026</span></small>
     </footer>
-
-
-
-    <!-- Toast Container -->
-
-
-    <!-- Modal  -->
 
 
     <script src="script.js"></script>

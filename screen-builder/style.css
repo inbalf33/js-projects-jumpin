@@ -43,24 +43,24 @@ textarea:placeholder-shown {
 }
 
 .element-wrapper {
-    width: fit-content; /* המעטפת תתכווץ בדיוק לפי הגודל של האלמנט שבתוכה */
+    width: fit-content; 
 }
 
 
-/* 1. מורידים את המסגרת מהמעטפת החיצונית */
+
 .selected-element-highlight {
     outline: none !important;
     box-shadow: none !important;
 }
 
-/* 2. מרימים את המסגרת הצהובה אך ורק על התוכן הפנימי (כפתור, כותרת, תמונה וכו') */
+
 .selected-element-highlight > *:not(.delete-btn) {
     outline: 3px solid #ffc107 !important;
     box-shadow: 0 0 10px rgba(255, 193, 7, 0.8) !important;
     transition: outline 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
-/* 3. כפתור הפח נשאר מוצג קבוע כשנבחר */
+
 .selected-element-highlight .delete-btn {
     opacity: 1 !important;
     visibility: visible !important;
@@ -73,7 +73,7 @@ input.form-control,
     text-decoration: none !important;
 }
 
-/* ביטול קו תחתון בשדות קלט ובטקסט המקדים שלהם */
+
 .element-wrapper input,
 .element-wrapper input::placeholder {
     text-decoration: none !important;

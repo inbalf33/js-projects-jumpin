@@ -325,7 +325,6 @@ function getFormInputInputs() {
 function collectFormData() {
     const activeType = currentElementType;
 
-// מציאת השדה ההכרחי לפי סוג האלמנט
     let requiredInputId = '';
     switch (activeType) {
         case 'h1': requiredInputId = 'prop-h1-text'; break;
@@ -337,11 +336,11 @@ function collectFormData() {
 
     const requiredInput = document.getElementById(requiredInputId);
 
-    // ולידציה: אם השדה ההכרחי ריק או מכיל רק רווחים
+    
     if (requiredInput && !requiredInput.value.trim()) {
-        requiredInput.classList.add('is-invalid'); // מוסיף מסגרת אדומה של Bootstrap
+        requiredInput.classList.add('is-invalid'); 
         requiredInput.focus();
-        return null; // מחזירים null כדי לסמן שהטופס לא תקין!
+        return null; 
     } else if (requiredInput) {
         requiredInput.classList.remove('is-invalid');
     }
@@ -418,16 +417,13 @@ function resetFormDefaults(selectedType) {
     if (sidebarFields.fontSize) sidebarFields.fontSize.value = defaultFontSize;
     if (sidebarFields.textColor) sidebarFields.textColor.value = '#000000';
     if (sidebarFields.bgColor) sidebarFields.bgColor.value = '#ffffff';
-
-    // איפוס checkbox
-    if (sidebarFields.btnBold) sidebarFields.btnBold.checked = false;
-    if (sidebarFields.btnUnderline) sidebarFields.btnUnderline.checked = false;
     
-    // החזרת רדיו ימין לברירת מחדל
+    if (sidebarFields.btnBold) sidebarFields.btnBold.checked = false;
+    if (sidebarFields.btnUnderline) sidebarFields.btnUnderline.checked = false;    
+    
     const rightRadio = document.getElementById('align-right');
     if (rightRadio) rightRadio.checked = true;
 }
-
 
 function saveToLocalStorage() {
     localStorage.setItem('canvas_elements', JSON.stringify(elementsArray));
@@ -500,8 +496,7 @@ function renderElementHTML(element) {
             contentHTML = `<img src="${imgSrc}" alt="תמונה" style="${imgStyles}" />`;
             break;
 
-        case 'input':
-            // החלת ה-inlineStyles על ה-label עצמו במקום על ה-div העוטף
+        case 'input':            
             const labelText = extra.label ? `<label style="display: block; margin-bottom: 4px; ${inlineStyles}">${extra.label}</label>` : '';
             contentHTML = `
                 <div>
@@ -552,7 +547,7 @@ function handleAddElement(e) {
 }
 
 
-// פונקציה להצגת כל האלמנטים מחדש בקנבס
+
 function renderCanvas() {
     if (!canvasContainer) return;
 
@@ -568,7 +563,7 @@ function renderCanvas() {
     canvasContainer.innerHTML = elementsArray.map(el => renderElementHTML(el)).join('');
 }
 
-// פונקציית המחיקה
+
 function handleDeleteElement(event, idToDelete) {    
     if (event) event.stopPropagation();
     
@@ -624,7 +619,7 @@ function handleResetCanvas() {
 };
 
 
-canvasContainer
+
 // ---- Event Listeners ----
 
 
