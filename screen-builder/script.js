@@ -1,362 +1,642 @@
-const ICONS = ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮'];
-let cardsArray = [];
 
-const resetToastEl = document.getElementById('reset-toast');
-let winModal = null;
+let elementsArray = [];
 
-const player1Input = document.getElementById("player1-name");
-const player2Input = document.getElementById("player2-name");
+let currentElementType = 'h1';
 
-const btnStartGame = document.getElementById("start-btn");
+let currentSelectedElement = null;
 
-const setupForm = document.getElementById("setup-form");
+const sidebarFields = {
+    // מאפיינים כלליים
+    width: document.getElementById('prop-width'),
+    height: document.getElementById('prop-height'),
+    marginV: document.getElementById('prop-margin-v'),
+    marginH: document.getElementById('prop-margin-h'),    
+    
+    fontSize: document.getElementById('prop-font-size'),
+    textColor: document.getElementById('prop-text-color'),
+    bgColor: document.getElementById('prop-bg-color'),
 
-const setupScreen = document.getElementById("setup-screen");
-const gameScreen = document.getElementById("game-screen");
+    btnBold: document.getElementById('prop-bold'),
+    btnUnderline: document.getElementById('prop-underline'),
+};
 
-const gameBoard = document.getElementById("game-board");
+const elementForm = document.getElementById("element-form");
 
-const p1NameDisplay = document.getElementById("p1-name-display");
-const p2NameDisplay = document.getElementById("p2-name-display");
+const sideBarTitle = document.getElementById("sidebar-title");
 
-const btnNewGame = document.getElementById("new-game-btn");
-const btnResetGame = document.getElementById("reset-btn");
+const elementTypeSelector= document.getElementById("element-type-selector");
 
-const timerDisplay = document.getElementById("timer-display");
-let timerInterval = null;
-let totalSeconds = 0;
+const textStyleContainer = document.getElementById("text-styling-container");
 
-const p1Attempts = document.getElementById("p1-attempts");
-const p1Pairs = document.getElementById("p1-pairs");
-const p1Wins = document.getElementById("p1-wins");
+const dynamicInputsContainer = document.getElementById("dynamic-inputs");
 
-const p2Attempts = document.getElementById("p2-attempts");
-const p2Pairs = document.getElementById("p2-pairs");
-const p2Wins = document.getElementById("p2-wins");
+const btnSubmit = document.getElementById("submit-btn");
+
+const canvasContainer = document.getElementById("canvas-container");
+
+const elementTypeContainer = document.getElementById("element-type-container");
+
+const btnReset = document.getElementById("reset-btn");
 
 
-const turnInicator = document.getElementById("turn-indicator");
-const p1Card = document.getElementById("player1-card");
-const p2Card = document.getElementById("player2-card");
 
-const modalIcon = document.getElementById("winner-icon");
-const modalTitle = document.getElementById("winner-title");
-const modalMessage = document.getElementById("winner-message");
-const modalWinTracker = document.getElementById("win-tracker-summary");
 
-const btnRematch = document.getElementById("rematch-btn");
-const btnNewGameModal = document.getElementById("new-game-modal-btn");
 
-let gameState = {};
 
-let firstCard = null;      
-let secondCard = null;     
-let lockBoard = false;  
+
 
 // ---- Function ----
 
-function checkInputs() {
-    if (player1Input.value.trim() !== "" && player2Input.value.trim() !== "") {
-        btnStartGame.disabled = false;
+function handleElementTypeChange(e) {
+    const selectedType = e ? e.target.value : "h1";
+    currentElementType = selectedType;
+
+    resetFormDefaults(selectedType);
+    updateSidebarTitle(selectedType);
+    toggleTextStyleSection(selectedType);
+    renderDynamicInputs(selectedType);
+};
+
+function updateSidebarTitle(selectedType) {
+    const sideTitle = "הוספת אלמנט - "
+    switch (selectedType) {
+    case "p":
+        sideBarTitle.innerText = sideTitle + "פסקה";
+        break;
+    case "img":
+        sideBarTitle.innerText = sideTitle + "תמונה";
+        break;
+    case "button":
+        sideBarTitle.innerText = sideTitle + "כפתור";
+        break;
+    case "input":
+        sideBarTitle.innerText = sideTitle + "שדה קלט";
+        break;
+    case "h1":
+    default:
+        sideBarTitle.innerText = sideTitle + "כותרת";
+        break;
+    }
+};
+
+function toggleTextStyleSection(selectedType) {
+    if (selectedType === "img") {
+        textStyleContainer.classList.add("d-none");        
     } else {
-        btnStartGame.disabled = true;
+        textStyleContainer.classList.remove("d-none");
     }
 };
 
 
-function handleSetupSubmit(e) {
-    e.preventDefault(); 
-    
-    const selectedDifficulty = document.querySelector('input[name="difficulty"]:checked').value;
-    
-    gameState = {
-        player1: player1Input.value.trim(),
-        player2: player2Input.value.trim(),
-        difficulty: Number(selectedDifficulty), 
-        currentTurn: 1,
-        p1Attempts: 0, 
-        p2Attempts: 0, 
-        p1Score: 0,
-        p2Score: 0,
-        p1Wins: 0,
-        p2Wins: 0, 
-        totalPairs: Number(selectedDifficulty) / 2, 
-        matchedPairs: 0     
-    };
-    setupScreen.classList.toggle("d-none");
-    gameScreen.classList.toggle("d-none");
 
-    p1NameDisplay.innerText = gameState.player1;
-    p2NameDisplay.innerText = gameState.player2;
+function renderDynamicInputs(selectedType) {    
+    let htmlContent = "";
 
-    turnInicator.innerText = `תור: ${gameState.player1}`
+    switch (selectedType) {
+        case "p":
+            htmlContent = getParagraphInputs();
+            break;
+        case "img":
+            htmlContent = getImageInputs();
+            break;
+        case "button":
+            htmlContent = getButtonInputs();
+            break;
+        case "input":
+            htmlContent = getFormInputInputs();
+            break;
+        case "h1":
+        default:
+            htmlContent = getHeadingInputs();
+            break;
+    }
+    dynamicInputsContainer.innerHTML = htmlContent;
 
-    createBoard();
-    renderBoard();
-    startTimer();    
+    resetFormDefaults(selectedType);
 };
 
-function handleNewGame() {
-    const toast = bootstrap.Toast.getInstance(resetToastEl);
-    if (toast) {
-        toast.hide();
-    }
-    player1Input.value = "";
-    player2Input.value = "";
-    btnStartGame.disabled = true;
 
-    setupScreen.classList.toggle("d-none");
-    gameScreen.classList.toggle("d-none");
 
-    handleReset();
-}
-
-function createBoard() {
-    let pairsCount = gameState.totalPairs;     
-    let sliceIcons = ICONS.slice(0,pairsCount);
-    let tempCardsArray = [...sliceIcons, ...sliceIcons];
-    
-    cardsArray = tempCardsArray.sort(() => Math.random() - 0.5);     
-}
-
-function renderBoard() {
-    gameBoard.innerHTML = "";
- 
-    const isHard = cardsArray.length === 24;
-    const colClass = isHard ? "col-auto" : "col-3 col-md-2";
-    const colStyle = isHard ? 'style="width: 12.5%;"' : '';
-
-    const boardHtml = cardsArray.map((card, index) => `
-        <div class="${colClass} d-flex justify-content-center" ${colStyle}>
-            <div class="card card-item game-card closed w-100 ratio ratio-1x1 shadow-sm text-center" data-index="${index}">
-                <div class="card-content d-flex align-items-center justify-content-center h-100">
-                    <span class="card-icon display-4 user-select-none mb-0">${card}</span>
-                </div>
-            </div>
+function getHeadingInputs() {
+    return `
+        <div class="mb-3">
+            <label for="prop-h1-text" class="form-label small ">
+            תוכן הכותרת <span class="text-danger">*</span>:
+            </label>            
+            <input 
+                type="text" 
+                id="prop-h1-text" 
+                class="form-control form-control-sm"                 
+                placeholder="הכנס את טקסט הכותרת" 
+                dir="auto"
+                required
+            >
         </div>
-    `).join('');
+    `;
+};
 
-    gameBoard.innerHTML = boardHtml;
+function getParagraphInputs() {
+    return `
+        <div class="mb-3">
+            <label for="prop-p-text" class="form-label small">
+            תוכן הפסקה <span class="text-danger">*</span>:
+            </label>            
+            <textarea 
+                id="prop-p-text" 
+                class="form-control form-control-sm" 
+                rows="3" 
+                placeholder="הכנס את טקסט הפסקה" 
+                dir="auto"
+                required
+            ></textarea>
+        </div>
+    `;
 }
 
-function handleReset(e) {
-    p1Attempts.innerText = 0;
-    p1Pairs.innerText = 0;
-    p2Attempts.innerText = 0;
-    p2Pairs.innerText = 0;  
-    gameState.currentTurn = 1; 
-    gameState.p1Attempts = 0; 
-    gameState.p2Attempts = 0; 
-    gameState.p1Score = 0; 
-    gameState.p2Score = 0; 
-    gameState.matchedPairs = 0; 
+function getImageInputs() {
+    return `        
+        <div class="mb-3">
+            <label for="prop-img-url" class="form-label small">
+                כתובת התמונה (URL) <span class="text-danger">*</span>:
+            </label>
+            <input 
+                type="url" 
+                id="prop-img-url" 
+                class="form-control form-control-sm" 
+                placeholder="https://example.com/image.jpg" 
+                required
+            >
+        </div>
+        
+        <div class="d-flex align-items-center mb-2">
+            <label for="prop-img-radius" class="form-label small mb-0" style="width: 120px;">
+                <i class="bi bi-bounding-box-circles me-1"></i>רדיוס (px):
+            </label>
+            <input 
+                type="number" 
+                id="prop-img-radius" 
+                class="form-control form-control-sm text-center" 
+                style="width: 70px;" 
+                value="0" 
+                min="0"
+            >
+        </div>
+        
+        <div class="d-flex align-items-center mb-2">
+            <label for="prop-img-border-width" class="form-label small mb-0" style="width: 120px;">
+                עובי מסגרת (px):
+            </label>
+            <input 
+                type="number" 
+                id="prop-img-border-width" 
+                class="form-control form-control-sm text-center" 
+                style="width: 70px;" 
+                value="0" 
+                min="0"
+            >
+        </div>
+        
+        <div class="d-flex align-items-center mb-3">
+            <label for="prop-img-border-color" class="form-label small mb-0" style="width: 120px;">
+                צבע מסגרת:
+            </label>
+            <input 
+                type="color" 
+                id="prop-img-border-color" 
+                class="form-control form-control-color form-control-sm" 
+                style="width: 70px;"
+                value="#000000"
+            >
+        </div>
+    `;
+}
 
-    if (e && e.target && e.target.closest('#reset-btn')) {
-        p1Wins.innerText = 0;
-        p2Wins.innerText = 0; 
-        gameState.p1Wins = 0; 
-        gameState.p2Wins = 0; 
-        const toast = new bootstrap.Toast(resetToastEl);
-        toast.show();
+function getButtonInputs() {
+    return `        
+        <div class="d-flex align-items-center mb-3">
+            <label for="prop-btn-text" class="form-label small mb-0 text-nowrap" style="width: 130px; flex-shrink: 0;">
+                טקסט הכפתור <span class="text-danger">*</span>:
+            </label>
+            <input 
+                type="text" 
+                id="prop-btn-text" 
+                class="form-control form-control-sm flex-grow-1" 
+                style="width: 0;"
+                placeholder="לחץ כאן" 
+                required
+                dir="auto"
+            >
+        </div>
+        
+        <div class="d-flex align-items-center mb-2">
+            <label for="prop-btn-radius" class="form-label small mb-0" style="width: 120px;">
+                <i class="bi bi-bounding-box-circles me-1"></i>רדיוס (px):
+            </label>
+            <input 
+                type="number" 
+                id="prop-btn-radius" 
+                class="form-control form-control-sm text-center" 
+                style="width: 70px;" 
+                value="4" 
+                min="0"
+            >
+        </div>
+        
+        <div class="d-flex align-items-center mb-2">
+            <label for="prop-btn-border-width" class="form-label small mb-0" style="width: 120px;">
+                עובי מסגרת (px):
+            </label>
+            <input 
+                type="number" 
+                id="prop-btn-border-width" 
+                class="form-control form-control-sm text-center" 
+                style="width: 70px;" 
+                value="1" 
+                min="0"
+            >
+        </div>
+        
+        <div class="d-flex align-items-center mb-3">
+            <label for="prop-btn-border-color" class="form-label small mb-0" style="width: 120px;">
+                צבע מסגרת:
+            </label>
+            <input 
+                type="color" 
+                id="prop-btn-border-color" 
+                class="form-control form-control-color form-control-sm" 
+                style="width: 70px;"
+                value="#000000"
+            >
+        </div>
+    `;
+}
+
+function getFormInputInputs() {
+    return `        
+        <div class="d-flex align-items-center mb-2">
+            <label for="prop-input-label" class="form-label small mb-0 text-nowrap" style="width: 130px; flex-shrink: 0;">
+                תוכן התווית <span class="text-danger">*</span>:
+            </label>
+            <input 
+                type="text" 
+                id="prop-input-label" 
+                class="form-control form-control-sm flex-grow-1" 
+                style="width: 0;"
+                placeholder="למשל: שם מלא" 
+                required
+                dir="auto"
+            >
+        </div>
+
+        <div class="d-flex align-items-center mb-2">
+            <label for="prop-input-placeholder" class="form-label small mb-0 text-nowrap" style="width: 130px; flex-shrink: 0;">
+                טקסט מנחה:
+            </label>
+            <input 
+                type="text" 
+                id="prop-input-placeholder" 
+                class="form-control form-control-sm flex-grow-1" 
+                style="width: 0;"
+                placeholder="הכנס את שם השדה" 
+                dir="auto"
+            >
+        </div>
+
+        <div class="d-flex align-items-center mb-3">
+            <label for="prop-input-type" class="form-label small mb-0 text-nowrap" style="width: 130px; flex-shrink: 0;">
+                סוג השדה:
+            </label>
+            <select 
+                id="prop-input-type" 
+                class="form-select form-select-sm flex-grow-1" 
+                style="width: 0;"
+            >
+                <option value="text" selected>טקסט (text)</option>
+                <option value="number">מספר (number)</option>
+                <option value="email">אימייל (email)</option>
+                <option value="password">סיסמה (password)</option>
+            </select>
+        </div>
+    `;
+}
+
+
+
+function collectFormData() {
+    const activeType = currentElementType;
+
+// מציאת השדה ההכרחי לפי סוג האלמנט
+    let requiredInputId = '';
+    switch (activeType) {
+        case 'h1': requiredInputId = 'prop-h1-text'; break;
+        case 'p': requiredInputId = 'prop-p-text'; break;
+        case 'img': requiredInputId = 'prop-img-url'; break;
+        case 'button': requiredInputId = 'prop-btn-text'; break;
+        case 'input': requiredInputId = 'prop-input-label'; break;
     }
-    createBoard();
-    renderBoard(); 
-    startTimer();
-    resetTurn();  
-}
 
+    const requiredInput = document.getElementById(requiredInputId);
 
-// Timer functions
-
-function updateTimerDisplay() {
-    const minutes = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
-    const seconds = (totalSeconds % 60).toString().padStart(2, '0');   
-    
-    timerDisplay.innerText = `${minutes}:${seconds}`;
-}
-
-function startTimer() {    
-    stopTimer();
-    
-    totalSeconds = 0;
-    updateTimerDisplay(); 
-    
-    timerInterval = setInterval(() => {
-        totalSeconds++;
-        updateTimerDisplay();
-    }, 1000);
-}
-
-function stopTimer() {
-    if (timerInterval) {
-        clearInterval(timerInterval);
-        timerInterval = null;
+    // ולידציה: אם השדה ההכרחי ריק או מכיל רק רווחים
+    if (requiredInput && !requiredInput.value.trim()) {
+        requiredInput.classList.add('is-invalid'); // מוסיף מסגרת אדומה של Bootstrap
+        requiredInput.focus();
+        return null; // מחזירים null כדי לסמן שהטופס לא תקין!
+    } else if (requiredInput) {
+        requiredInput.classList.remove('is-invalid');
     }
+
+    const elementData = {
+        id: Date.now(),
+        type: activeType,     
+        general: {
+            width: sidebarFields.width?.value || '100',
+            height: sidebarFields.height?.value || 'auto',
+            marginVertical: sidebarFields.marginV?.value || '8',
+            marginHorizontal: sidebarFields.marginH?.value || '0'
+        },        
+        style: {
+            fontSize: sidebarFields.fontSize?.value || '16',
+            textColor: sidebarFields.textColor?.value || '#000000',
+            bgColor: sidebarFields.bgColor?.value || 'transparent',
+            textAlign: document.querySelector('input[name="propAlign"]:checked')?.value || 'right',
+            isBold: sidebarFields.btnBold?.checked || false,
+            isUnderline: sidebarFields.btnUnderline?.checked || false
+        },
+        extra: {}
+    };
+
+    switch (activeType) {
+        case "h1":
+            elementData.extra.text = document.getElementById('prop-h1-text')?.value || '';
+            break;
+        case "p":
+            elementData.extra.text = document.getElementById('prop-p-text')?.value || '';
+            break;
+        case "img":
+            elementData.extra.src = document.getElementById('prop-img-url')?.value || '';        
+            elementData.extra.radius = document.getElementById('prop-img-radius')?.value || '0';
+            elementData.extra.borderWidth = document.getElementById('prop-img-border-width')?.value || '0';
+            elementData.extra.borderColor = document.getElementById('prop-img-border-color')?.value || '#000000';
+            break;
+        case "button":
+            elementData.extra.text = document.getElementById('prop-btn-text')?.value || '';
+            elementData.extra.radius = document.getElementById('prop-btn-radius')?.value || '4';
+            elementData.extra.borderWidth = document.getElementById('prop-btn-border-width')?.value || '0';
+            elementData.extra.borderColor = document.getElementById('prop-btn-border-color')?.value || '#000000';
+            break;
+        case "input":
+            elementData.extra.label = document.getElementById('prop-input-label')?.value || '';
+            elementData.extra.placeholder = document.getElementById('prop-input-placeholder')?.value || '';
+            elementData.extra.inputType = document.getElementById('prop-input-type')?.value || 'text';
+            break;
+    }
+    return elementData;
+};
+
+function resetFormDefaults(selectedType) {
+    let defaultWidth = '100'; 
+    let defaultFontSize = '16'; 
+
+    
+    if (selectedType === 'input') {
+        defaultWidth = '30'; 
+    } else if (selectedType === 'button') {
+        defaultWidth = '10';
+    } else if (selectedType === 'img') {
+        defaultWidth = '50';
+    } else if (selectedType === 'h1') {
+        defaultFontSize = '24';
+    }
+
+    if (sidebarFields.width) sidebarFields.width.value = defaultWidth;
+
+    if (sidebarFields.height) sidebarFields.height.value = '';
+    if (sidebarFields.marginV) sidebarFields.marginV.value = '8';
+    if (sidebarFields.marginH) sidebarFields.marginH.value = '0';
+    
+    if (sidebarFields.fontSize) sidebarFields.fontSize.value = defaultFontSize;
+    if (sidebarFields.textColor) sidebarFields.textColor.value = '#000000';
+    if (sidebarFields.bgColor) sidebarFields.bgColor.value = '#ffffff';
+
+    // איפוס checkbox
+    if (sidebarFields.btnBold) sidebarFields.btnBold.checked = false;
+    if (sidebarFields.btnUnderline) sidebarFields.btnUnderline.checked = false;
+    
+    // החזרת רדיו ימין לברירת מחדל
+    const rightRadio = document.getElementById('align-right');
+    if (rightRadio) rightRadio.checked = true;
 }
 
 
-// Cards Click functions
+function saveToLocalStorage() {
+    localStorage.setItem('canvas_elements', JSON.stringify(elementsArray));
+};
 
-function handleCardClick(e) {
-    const clickedCard = e.target.closest('.game-card');
+function loadFromLocalStorage() {
+    const savedData = localStorage.getItem("canvas_elements");
+    if (savedData) {        
+        elementsArray = JSON.parse(savedData) || [];
+    } else {
+        elementsArray = []; 
+    }
+    renderCanvas(); 
+}
+
+
+
+function renderElementHTML(element) {
+    const { id, type, general, style, extra } = element; 
     
-    if (lockBoard || !clickedCard || clickedCard.classList.contains('flipped') || clickedCard === firstCard) {
+    const widthVal = (general.width.endsWith('%') || general.width.endsWith('px')) 
+        ? general.width 
+        : general.width + '%';
+
+    const inlineStyles = [
+        `width: ${widthVal}`,
+        `height: ${general.height === 'auto' || !general.height ? 'auto' : general.height + 'px'}`,
+        `margin: ${general.marginVertical}px ${general.marginHorizontal}px`,
+        `font-size: ${style.fontSize}px`,
+        `color: ${style.textColor}`,
+        `background-color: ${style.bgColor}`,
+        `text-align: ${style.textAlign || 'right'}`,
+        `font-weight: ${style.isBold ? 'bold' : 'normal'}`,
+        `text-decoration: ${style.isUnderline ? 'underline' : 'none'}`,
+        `box-sizing: border-box`,
+        `overflow-wrap: break-word`,
+        `padding: 4px 8px`,
+        `display: block`
+    ].join('; ');
+
+    
+    let contentHTML = '';
+    switch (type) {
+        case 'h1':
+            contentHTML = `<h1 style="${inlineStyles}">${extra.text || 'כותרת חדשה'}</h1>`;
+            break;
+
+        case 'p':
+            contentHTML = `<p style="${inlineStyles}">${extra.text || 'טקסט חדש...'}</p>`;
+            break;
+
+        case 'button':
+            const buttonStyles = [
+                inlineStyles,
+                `border-radius: ${extra.radius || 0}px`,
+                `border: ${extra.borderWidth || 0}px solid ${extra.borderColor || '#000000'}`,
+                `cursor: pointer`
+            ].join('; ');
+            contentHTML = `<button class="builder-btn" style="${buttonStyles}">${extra.text || 'לחץ כאן'}</button>`;
+            break;
+
+        case 'img':            
+            const imgSrc = extra.src;
+            const imgStyles = [
+                inlineStyles,
+                `border-radius: ${extra.radius || 0}px`,
+                `border: ${extra.borderWidth || 0}px solid ${extra.borderColor || '#000000'}`,
+                `object-fit: contain`
+            ].join('; ');
+            contentHTML = `<img src="${imgSrc}" alt="תמונה" style="${imgStyles}" />`;
+            break;
+
+        case 'input':
+            // החלת ה-inlineStyles על ה-label עצמו במקום על ה-div העוטף
+            const labelText = extra.label ? `<label style="display: block; margin-bottom: 4px; ${inlineStyles}">${extra.label}</label>` : '';
+            contentHTML = `
+                <div>
+                    ${labelText}
+                    <input type="text" placeholder="${extra.placeholder || 'הקלד כאן...'}" class="form-control" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;" />
+                </div>
+            `;
+            break;
+    }
+   
+    return `
+        <div class="element-wrapper position-relative d-inline-block w-100" data-id="${id}">
+            
+            <button 
+                type="button" 
+                class="delete-btn btn btn-danger btn-sm rounded-circle position-absolute top-0 start-0 m-1 d-flex align-items-center justify-content-center "
+                title="מחק אלמנט"
+                onclick="handleDeleteElement(event, ${id})"
+            >
+                <i class="bi bi-trash"></i>
+            </button>            
+            ${contentHTML}
+        </div>
+    `;
+};
+
+function handleAddElement(e) {
+    if (e) e.preventDefault();
+
+    const newElement = collectFormData();
+    if (!newElement) {    
+        return;
+    }
+    
+    elementsArray.push(newElement);
+    saveToLocalStorage();
+    
+    if (canvasContainer) {
+        const emptyState = canvasContainer.querySelector('.text-center.text-muted');
+        if (emptyState) {
+            emptyState.remove();
+        }
+
+        canvasContainer.insertAdjacentHTML('beforeend', renderElementHTML(newElement));
+    }
+    
+    resetFormDefaults(currentElementType);
+}
+
+
+// פונקציה להצגת כל האלמנטים מחדש בקנבס
+function renderCanvas() {
+    if (!canvasContainer) return;
+
+    if (elementsArray.length === 0) {
+        canvasContainer.innerHTML = `
+            <div class="text-center text-muted p-5">
+                <i class="bi bi-plus-circle fs-1 d-block mb-2"></i>
+                בחר אלמנט מהסרגל הצידי ולחץ על הוספה
+            </div>`;
         return;
     }
 
-    clickedCard.classList.remove('closed');
-    clickedCard.classList.add('flipped');
+    canvasContainer.innerHTML = elementsArray.map(el => renderElementHTML(el)).join('');
+}
 
-    if (!firstCard) {
-        firstCard = clickedCard; 
+// פונקציית המחיקה
+function handleDeleteElement(event, idToDelete) {    
+    if (event) event.stopPropagation();
+    
+    elementsArray = elementsArray.filter(item => item.id !== idToDelete);
+    
+    saveToLocalStorage();    
+    renderCanvas();
+}
+
+
+
+function toggleElementTypeSection(shouldShow) {
+    if (shouldShow) {
+        elementTypeContainer.classList.remove("d-none");
     } else {
-        secondCard = clickedCard;
-        lockBoard = true;
-        checkCardsMatch();
+        elementTypeContainer.classList.add("d-none");
+    }
+}
+
+
+function highlightElement(elementToHighlight) {
+    
+    if (currentSelectedElement) {
+        currentSelectedElement.classList.remove("selected-element-highlight");
+    }
+
+    
+    if (elementToHighlight) {
+        currentSelectedElement = elementToHighlight;
+        currentSelectedElement.classList.add("selected-element-highlight");
+    } else {
+        currentSelectedElement = null; 
     }
 };
 
-function checkCardsMatch() {
-    const firstIndex = Number(firstCard.dataset.index);
-    const secondIndex = Number(secondCard.dataset.index);
 
-    if (gameState.currentTurn ===1) {
-        gameState.p1Attempts ++;
-        p1Attempts.innerText = gameState.p1Attempts;
-        
-    } else {
-        gameState.p2Attempts ++;
-        p2Attempts.innerText = gameState.p2Attempts;
-
-    }
-
-    if (cardsArray[firstIndex] === cardsArray[secondIndex]) {
-        disableCards();
-    } else {
-       unflipCards();
-    }   
-}
-
-
-function disableCards() {
-    const matchClass = gameState.currentTurn === 1 ? 'matched-p1' : 'matched-p2';
-    firstCard.classList.add(matchClass);
-    secondCard.classList.add(matchClass);
-
-    if (gameState.currentTurn ===1) {
-        gameState.p1Score ++;
-        p1Pairs.innerText = gameState.p1Score;
-    } else {
-        gameState.p2Score ++;
-        p2Pairs.innerText = gameState.p2Score;
-    }
-
-    gameState.matchedPairs ++;
-    resetTurn();
-
-    if (gameState.matchedPairs === gameState.totalPairs) {
-        stopTimer();
-        showWinModal()
-    }
-}
-
-function unflipCards() {
-
-    setTimeout(() => {
-        firstCard.classList.remove('flipped');
-        firstCard.classList.add('closed');
-        secondCard.classList.remove('flipped');
-        secondCard.classList.add('closed');
-
-        gameState.currentTurn = gameState.currentTurn === 1 ? 2 : 1;
-        if (gameState.currentTurn === 1) {
-            turnInicator.classList.remove(`bg-success`);
-            turnInicator.classList.add(`bg-primary`);
-
-            p2Card.classList.remove(`border-success`, `border-4`);
-            p2Card.classList.add(`border-2`);
-
-            p1Card.classList.add(`border-primary`, `border-4`);            
-            p1Card.classList.remove(`border-2`); 
-
-            turnInicator.innerText = `תור: ${gameState.player1}`
-        } else {
-            turnInicator.classList.remove(`bg-primary`);
-            turnInicator.classList.add(`bg-success`);
-
-            p1Card.classList.remove(`border-primary`, `border-4`);
-            p1Card.classList.add(`border-2`);
-
-            p2Card.classList.add(`border-success`, `border-4`); 
-            p2Card.classList.remove(`border-2`); 
-
-            turnInicator.innerText = `תור: ${gameState.player2}`
-        }
-        resetTurn();
-    }, 1200);  
+function handleElementSelect(e) {   
+    const clickedElement = e.target.closest('.element-wrapper');
       
-}
+    if (!clickedElement) {
+        highlightElement(null);
+        return;
+    };
+   
+    highlightElement(clickedElement);
+};
 
-function resetTurn() {
-    firstCard = null;
-    secondCard = null;
-    lockBoard = false;
-}
-
-function showWinModal() {
-    if (!winModal) {
-        winModal = new bootstrap.Modal(document.getElementById('winModal'));
-    }
-    winModal.show();
-    const player1Score = gameState.p1Score;
-    const player2Score = gameState.p2Score;
-
-
-    if (player1Score > player2Score) {        
-        gameState.p1Wins++;
-        p1Wins.innerText = gameState.p1Wins;
-        modalIcon.innerText = "🎉";
-        modalTitle.innerText = `כל הכבוד ${gameState.player1} !`;
-        modalMessage.innerText = `ניצחת עם ${gameState.p1Score} זוגות מתוך ${gameState.totalPairs} 
-        לעומת ${gameState.p2Score} זוגות של ${gameState.player2}`
-    } else if (player1Score < player2Score) {        
-        gameState.p2Wins++;
-        p2Wins.innerText = gameState.p2Wins;
-        modalIcon.innerText = "🎉";
-        modalTitle.innerText = `כל הכבוד ${gameState.player2} !`;
-        modalMessage.innerText = `ניצחת עם ${gameState.p2Score} זוגות מתוך ${gameState.totalPairs} 
-        לעומת ${gameState.p1Score} זוגות של ${gameState.player1}`
-    } else {
-        modalIcon.innerText = "🤝";
-        modalTitle.innerText = `תיקו מותח!`;
-        modalMessage.innerText = `שניכם מצאתם ${gameState.p1Score} זוגות מתוך ${gameState.totalPairs}`            
-    }
-    modalWinTracker.innerText = `${gameState.player1}: ${gameState.p1Wins} | ${gameState.player2}: ${gameState.p2Wins}`
-}
-
-function startRematch() {
-    winModal.hide();
-    handleReset();
-}
-
-function resetToSetup() {
-    winModal.hide();
-    handleReset();
-    handleNewGame();
-}
+function handleResetCanvas() {
+    elementsArray = [];    
+    localStorage.removeItem('canvas_elements');   
+    highlightElement(null);
+    renderCanvas();
+};
 
 
+canvasContainer
 // ---- Event Listeners ----
 
-player1Input.addEventListener("input", checkInputs);
-player2Input.addEventListener("input", checkInputs);
 
-setupForm.addEventListener("submit", handleSetupSubmit);
 
-btnNewGame.addEventListener("click", handleNewGame);
-btnResetGame.addEventListener("click", handleReset);
+elementTypeSelector.addEventListener("change", handleElementTypeChange);
 
-gameBoard.addEventListener('click', handleCardClick);
+btnSubmit.addEventListener('click', handleAddElement);
 
-btnRematch.addEventListener('click', startRematch);
-btnNewGameModal.addEventListener('click', resetToSetup);
+btnReset.addEventListener('click', handleResetCanvas);
+
+canvasContainer.addEventListener("click", handleElementSelect);
+
+renderDynamicInputs('h1');
+renderCanvas()
+loadFromLocalStorage()

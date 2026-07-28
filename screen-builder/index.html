@@ -33,19 +33,138 @@
     <main class="container-fluid my-4 flex-grow-1 d-flex flex-column">
         <div class="row g-4 flex-grow-1">
 
-            
+
             <aside class="col-12 col-lg-3">
-                <div class="bg-body-secondary rounded-4 shadow border p-3 h-100">
-                    <h5 class="fw-bold mb-3 text-center border-bottom pb-2">סרגל כלים</h5>
+                <div class="bg-body-secondary rounded-4 shadow border p-3 h-100 d-flex flex-column justify-content-between">
                     
-                    <!-- כאן נכניס בהמשך את בחירת האלמנטים והשדות הדינמיים -->
-                    <p class="text-muted small text-center">אפשרויות עריכה והוספה...</p>
+                    <div>
+                        <!-- כותרת דינאמית (משתנה בין הוספה לעריכה) -->
+                        <h5 id="sidebar-title" class="fw-bold mb-3 text-center border-bottom pb-2">הוספת אלמנט - כותרת</h5>
+
+                        <!-- Radio button - Elemnt Type -->
+                        <div class="mb-3 text-center" id="element-type-selector">
+                            <label class="form-label small fw-bold d-block text-start">בחר אלמנט:</label>
+                            <div class="btn-group w-100" role="group" >
+                                <input type="radio" class="btn-check" name="elementType" id="type-h1" value="h1" checked>
+                                <label class="btn btn-outline-primary" for="type-h1" title="כותרת"><i class="bi bi-type-h1 fs-5"></i></label>
+
+                                <input type="radio" class="btn-check" name="elementType" id="type-p" value="p">
+                                <label class="btn btn-outline-primary" for="type-p" title="פסקה"><i class="bi bi-text-paragraph fs-5"></i></label>
+
+                                <input type="radio" class="btn-check" name="elementType" id="type-img" value="img">
+                                <label class="btn btn-outline-primary" for="type-img" title="תמונה"><i class="bi bi-image fs-5"></i></label>
+
+                                <input type="radio" class="btn-check" name="elementType" id="type-btn" value="button">
+                                <label class="btn btn-outline-primary" for="type-btn" title="כפתור"><i class="bi bi-square-fill fs-5"></i></label>
+
+                                <input type="radio" class="btn-check" name="elementType" id="type-input" value="input">
+                                <label class="btn btn-outline-primary" for="type-input" title="שדה קלט"><i class="bi bi-input-cursor-text fs-5"></i></label>
+
+
+                            </div>
+                        </div>
+                        
+
+                        <form id="element-form">
+                            
+                            <!-- מאפיינים כלליים -->
+                            <div class="border-bottom pb-2 mb-2">
+                                <h6 class="fw-bold small text-muted mb-2">מאפיינים כלליים</h6>
+                                
+                                <div class="row g-2 mb-2 align-items-center">
+                                    <div class="col-6 d-flex align-items-center justify-content-between flex-wrap">
+                                        <label class="form-label small mb-0 me-1 text-nowrap">רוחב (%):</label>
+                                        <input type="number" id="prop-width" class="form-control form-control-sm text-center" value="100" min="10" max="100" dir="ltr" style="width: 70px;">
+                                    </div>
+                                    <div class="col-6 d-flex align-items-center justify-content-between flex-wrap">
+                                        <label class="form-label small mb-0 me-1 text-nowrap">גובה (px):</label>
+                                        <input type="number" id="prop-height" class="form-control form-control-sm text-center" placeholder="אוטומטי" min="10" dir="ltr" style="width: 81px;">
+                                    </div>
+                                </div>
+
+                                <div class="row g-2 align-items-center">
+                                    <div class="col-6 d-flex align-items-center justify-content-between flex-wrap">
+                                        <label class="form-label small mb-0 me-1 text-nowrap">רווח אנכי:</label>
+                                        <input type="number" id="prop-margin-v" class="form-control form-control-sm text-center" value="8" min="0" dir="ltr" style="width: 70px;">
+                                    </div>
+                                    <div class="col-6 d-flex align-items-center justify-content-between flex-wrap">
+                                        <label class="form-label small mb-0 me-1 text-nowrap">רווח אופקי:</label>
+                                        <input type="number" id="prop-margin-h" class="form-control form-control-sm text-center" value="0" min="0" dir="ltr" style="width: 81px;">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- מאפייני טקסט ועיצוב -->
+                            <div id="text-styling-container" class="border-bottom pb-2 mb-2">
+                                <h6 class="fw-bold small text-muted mb-2">עיצוב טקסט וצבעים</h6>
+
+                                <div class="row g-2 mb-2 align-items-center">
+                                <!-- גודל גופן -->
+                                <div class="col-4 d-flex align-items-center justify-content-between">
+                                    <label class="form-label small mb-0 me-1 text-nowrap">גודל:</label>
+                                    <input type="number" id="prop-font-size" class="form-control form-control-sm text-center" value="16" min="1" dir="ltr" style="width: 50px;">
+                                </div>
+                                
+                                <!-- הדגשה וקו תחתון -->
+                                <div class="col-3 d-flex justify-content-center">
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <input type="checkbox" class="btn-check" id="prop-bold" autocomplete="off">
+                                        <label class="btn btn-outline-secondary px-2 fw-bold" for="prop-bold" title="מוודגש">B</label>
+
+                                        <input type="checkbox" class="btn-check" id="prop-underline" autocomplete="off">
+                                        <label class="btn btn-outline-secondary px-2 text-decoration-underline" for="prop-underline" title="קו תחתון">U</label>
+                                    </div>
+                                </div>
+
+                                <!-- יישור -->
+                                <div class="col-5 d-flex align-items-center justify-content-end">
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <input type="radio" class="btn-check" name="propAlign" id="align-right" value="start" checked>
+                                        <label class="btn btn-outline-secondary px-2" for="align-right" title="ימין"><i class="bi bi-text-right"></i></label>
+
+                                        <input type="radio" class="btn-check" name="propAlign" id="align-center" value="center">
+                                        <label class="btn btn-outline-secondary px-2" for="align-center" title="מרכז"><i class="bi bi-text-center"></i></label>
+
+                                        <input type="radio" class="btn-check" name="propAlign" id="align-left" value="end">
+                                        <label class="btn btn-outline-secondary px-2" for="align-left" title="שמאל"><i class="bi bi-text-left"></i></label>
+                                    </div>
+                                </div>
+                                </div>
+
+                                <div class="row g-2 align-items-center">
+                                    <div class="col-6 d-flex align-items-center justify-content-between flex-wrap">
+                                        <label class="form-label small mb-0 me-1 text-nowrap">צבע טקסט:</label>
+                                        <input type="color" id="prop-text-color" class="form-control form-control-color btn-sm" value="#000000" style="width: 45px;">
+                                    </div>
+                                    <div class="col-6 d-flex align-items-center justify-content-between flex-wrap">
+                                        <label class="form-label small mb-0 me-1 text-nowrap">צבע רקע:</label>
+                                        <input type="color" id="prop-bg-color" class="form-control form-control-color btn-sm" value="#ffffff" style="width: 45px;">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- מאפיינים דינאמיים -->
+                            <h6 class="fw-bold small text-muted mb-2">מאפיינים נוספים</h6>
+                            
+                            <div id="dynamic-inputs">
+                            </div>
+
+                        </form>
+                    </div>
+
+                    <!-- כפתור פעולה ראשי בתחתית הסרגל -->
+                    <div class="mt-3">
+                        <button type="submit" form="element-form" id="submit-btn" class="btn btn-success w-100 fw-bold">
+                            <i class="bi bi-plus-lg me-1"></i> הוסף אלמנט
+                        </button>
+                    </div>
+
                 </div>
             </aside>
             
             
             <section class="col-12 col-lg-9 d-flex flex-column">
-                <div id="canvas" class="bg-white rounded-4 shadow-sm border p-4 flex-grow-1 position-relative overflow-auto">
+                <div id="canvas-container" class="bg-white rounded-4 shadow-sm border p-4 flex-grow-1 position-relative overflow-auto">
                     <!-- כאן יורנדרו האלמנטים הדינמיים בלייב -->
                     <div class="text-center text-muted py-5 my-5">
                         <i class="bi bi-plus-square fs-1"></i>
