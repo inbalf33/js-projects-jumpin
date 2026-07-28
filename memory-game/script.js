@@ -67,7 +67,7 @@ function checkInputs() {
 function handleSetupSubmit(e) {
     e.preventDefault(); 
     
-    const selectedDifficulty = document.querySelector('input[name="difficulty"]:checked').value;
+    const selectedDifficulty = e.target.elements.difficulty.value;
     
     gameState = {
         player1: player1Input.value.trim(),
