@@ -1,4 +1,5 @@
 const API_KEY = 'a7cbb5f5'; 
+// const API_KEY = 'ebc11664'; 
 const BASE_URL = 'https://www.omdbapi.com/';
 
 const searchForm = document.getElementById('search-form');

@@ -12,20 +12,41 @@
     <!-- Axios -->
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 
-
     <link rel="stylesheet" href="style.css">
     
-    
+    <style>
+        .search-wrapper {
+            position: relative;
+        }
+        #clear-search-btn {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+        #clear-search-btn i {
+            font-size: 1.4rem;
+            color: #dc3545; /* אדום בולט ויפה */
+            transition: color 0.2s;
+        }
+        #clear-search-btn:hover i {
+            color: #b02a37;
+        }
+    </style>
 </head>
 <body class="bg-light min-vh-100 d-flex flex-column justify-content-between p-0 m-0">
 
     <!-- Navbar -->
     <nav class="navbar bg-body-tertiary border-bottom shadow-sm px-3">
         <div class="container-fluid">
-            <!-- <div class="d-flex gap-2">
-                <button id="reset-btn" class="btn btn-outline-warning btn-sm fw-semibold">איפוס</button>                    
-            </div> -->
-                                
             <span class="navbar-brand mb-0 h1 fw-bold mx-auto fs-4">
                 אפליקציית חיפוש סרטים
             </span>            
@@ -34,19 +55,30 @@
 
     <main class="container my-4 flex-grow-1">
 
-        <!-- Searce Section  -->
+        <!-- Search Section -->
         <div class="row justify-content-center mb-4">
             <div class="col-md-8 col-lg-6">
-                <form id="search-form" class="d-flex gap-2">
-                    <input type="text" id="search-input" class="form-control form-control-lg" placeholder="הקלד שם של סרט (באנגלית)...">
-                    <button type="submit" class="btn btn-primary btn-lg px-4">
-                        <i class="bi bi-search"></i> חפש
-                    </button>
+                <form id="search-form">
+                    <!-- לייבל גדול ובולט -->
+                    <label for="search-input" class="form-label fw-bold fs-5 text-dark mb-2 d-block">חיפוש סרט:</label>
+                    
+                    <div class="d-flex gap-2 align-items-center">
+                        <div class="search-wrapper flex-grow-1">
+                            <input type="text" id="search-input" class="form-control form-control-lg ps-5" placeholder="הקלד שם של סרט (באנגלית)...">
+                            <!-- כפתור X אדום ובולט שמופיע רק כשיש טקסט -->
+                            <button type="button" id="clear-search-btn" class="d-none" title="נקה חיפוש">
+                                <i class="bi bi-x-circle-fill"></i>
+                            </button>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-lg px-4">
+                            <i class="bi bi-search"></i> חפש
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>
 
-        <!-- Filter Section  -->
+        <!-- Filter Section -->
         <div id="filters-container" class="row justify-content-center mb-4 d-none">
             <div class="col-md-8 col-lg-6">
                 <div class="card card-body bg-white border-0 shadow-sm p-3">
@@ -98,13 +130,37 @@
         <div id="movies-container" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4"></div>
     </main>   
 
-
-    
     <!-- Footer -->
     <footer class="text-center py-2 bg-body-tertiary border-top">
         <small class="text-muted">נוצר על ידי ענבל פיש <span dir="ltr">&copy; 2026</span></small>
     </footer>
 
+    <!-- לוגיקה להצגה/הסתרה של כפתור ה-X בהתאם להקלדה -->
+    <script>
+        const searchInputEl = document.getElementById('search-input');
+        const clearSearchBtn = document.getElementById('clear-search-btn');
+
+        function updateClearButtonVisibility() {
+            if (searchInputEl.value.trim() !== '') {
+                clearSearchBtn.classList.remove('d-none');
+            } else {
+                clearSearchBtn.classList.add('d-none');
+            }
+        }
+
+        // האזנה להקלדה בשדה
+        searchInputEl.addEventListener('input', updateClearButtonVisibility);
+
+        // פעולת הלחיצה על כפתור ה-X האדום
+        clearSearchBtn.addEventListener('click', function() {
+            searchInputEl.value = '';
+            updateClearButtonVisibility();
+            searchInputEl.focus();
+            if (typeof handleInputChange === 'function') {
+                handleInputChange();
+            }
+        });
+    </script>
 
     <script src="script.js"></script>
 </body>
